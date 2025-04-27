@@ -265,8 +265,8 @@ export const configureRouter = ({
       ctx.throw(409, 'Player ' + playerID + ' not available');
     }
 
-    const playerInitData = data.playerInit;
-    delete data.playerInit;
+    const playerInitData = data?.playerInit;
+    delete data?.playerInit;
 
     if (data) {
       metadata.players[playerID].data = data;
