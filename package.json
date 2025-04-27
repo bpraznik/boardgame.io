@@ -26,7 +26,7 @@
     "ts:watch": "tsc --noEmit --watch",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "npm run clean",
+    "prepublishOnly": "npm run clean",
     "proxydirs": "node scripts/proxy-dirs.js",
     "prepack": "run-s build proxydirs",
     "postpack": "npm run clean",
