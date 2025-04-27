@@ -1041,6 +1041,20 @@ describe('.configureRouter', () => {
                       },
                     },
                   },
+                  state: {
+                    G: {
+                      allPLayers: {
+                        '0': {
+                          name: 'alice',
+                          credentials: 'SECRET1',
+                        },
+                        '1': {
+                          name: 'bob',
+                          credentials: 'SECRET2',
+                        },
+                      },
+                    },
+                  },
                 };
               },
             });

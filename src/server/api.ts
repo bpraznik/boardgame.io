@@ -328,7 +328,9 @@ export const configureRouter = ({
     delete metadata.players[playerID].credentials;
     const hasPlayers = Object.values(metadata.players).some(({ name }) => name);
 
-    state.G.allPlayers[playerID] = {};
+    if (state?.G?.allPlayers) {
+      state.G.allPlayers[playerID] = {};
+    }
 
     await Promise.all([
       await (hasPlayers
