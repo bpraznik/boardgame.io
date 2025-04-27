@@ -239,8 +239,9 @@ export const configureRouter = ({
       ctx.throw(403, 'playerName is required');
     }
 
-    const { metadata } = await (db as StorageAPI.Async).fetch(matchID, {
+    const { metadata, state } = await (db as StorageAPI.Async).fetch(matchID, {
       metadata: true,
+      state: true,
     });
     if (!metadata) {
       ctx.throw(404, 'Match ' + matchID + ' not found');
@@ -264,6 +265,9 @@ export const configureRouter = ({
       ctx.throw(409, 'Player ' + playerID + ' not available');
     }
 
+    const playerInitData = data.playerInit;
+    delete data.playerInit;
+
     if (data) {
       metadata.players[playerID].data = data;
     }
@@ -271,7 +275,14 @@ export const configureRouter = ({
     const playerCredentials = await auth.generateCredentials(ctx);
     metadata.players[playerID].credentials = playerCredentials;
 
-    await db.setMetadata(matchID, metadata);
+    if (playerInitData) {
+      state.G.allPlayers[playerID] = playerInitData;
+    }
+
+    await Promise.all([
+      await db.setMetadata(matchID, metadata),
+      await db.setState(matchID, state),
+    ]);
 
     const body: LobbyAPI.JoinedMatch = { playerID, playerCredentials };
     ctx.body = body;
@@ -290,8 +301,9 @@ export const configureRouter = ({
     const matchID = ctx.params.id;
     const playerID = ctx.request.body.playerID;
     const credentials = ctx.request.body.credentials;
-    const { metadata } = await (db as StorageAPI.Async).fetch(matchID, {
+    const { metadata, state } = await (db as StorageAPI.Async).fetch(matchID, {
       metadata: true,
+      state: true,
     });
     if (typeof playerID === 'undefined' || playerID === null) {
       ctx.throw(403, 'playerID is required');
@@ -315,9 +327,16 @@ export const configureRouter = ({
     delete metadata.players[playerID].name;
     delete metadata.players[playerID].credentials;
     const hasPlayers = Object.values(metadata.players).some(({ name }) => name);
-    await (hasPlayers
-      ? db.setMetadata(matchID, metadata) // Update metadata.
-      : db.wipe(matchID)); // Delete match.
+
+    state.G.allPlayers[playerID] = {};
+
+    await Promise.all([
+      await (hasPlayers
+        ? db.setMetadata(matchID, metadata) // Update metadata.
+        : db.wipe(matchID)), // Delete match.
+      await db.setState(matchID, state),
+    ]);
+
     ctx.body = {};
   });
 
