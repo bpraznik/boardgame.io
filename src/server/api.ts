@@ -276,7 +276,9 @@ export const configureRouter = ({
     metadata.players[playerID].credentials = playerCredentials;
 
     if (playerInitData) {
-      state.G.allPlayers[playerID] = playerInitData;
+      const G = JSON.parse(JSON.stringify(state.G));
+      G.allPlayers[playerID.toString()] = playerInitData;
+      state.G = G;
     }
 
     await Promise.all([
