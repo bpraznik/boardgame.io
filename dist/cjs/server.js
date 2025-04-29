@@ -2262,7 +2262,7 @@ const configureRouter = ({ router, db, auth, games, uuid = () => nanoid.nanoid(1
      * @param {object} data - The default data of the player in the match.
      * @return - Player ID and credentials to use when interacting in the joined match.
      */
-    router.post('/games/:name/:id/join', koaBody__default["default"](), async (ctx) => {
+    router.post('/games/:name/:id/join', async (ctx) => {
         let playerID = ctx.request.body.playerID;
         const playerName = ctx.request.body.playerName;
         const data = ctx.request.body.data;
